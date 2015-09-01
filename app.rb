@@ -1,6 +1,7 @@
 require 'sinatra'
-require "sinatra/reloader" if development?
+require 'sinatra/reloader' if development?
 require 'dotenv'
+require './ramesh'
 Dotenv.load
 
 error 403 do
