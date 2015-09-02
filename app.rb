@@ -1,10 +1,8 @@
 require 'sinatra'
 require 'sinatra/reloader' if development?
-require 'dotenv'
 require './ramesh'
 require 'dalli'
 
-Dotenv.load
 CACHE_MAX_AGE = 12 * 60 * 60 # 12 hours
 VALID_TIME_CACHE_KEY = 'valid_time_list'
 
