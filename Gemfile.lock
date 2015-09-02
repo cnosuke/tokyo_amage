@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     backports (3.6.6)
+    dalli (2.7.4)
     dotenv (2.0.2)
     kgio (2.9.3)
     mini_magick (4.2.10)
@@ -35,6 +36,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dalli
   dotenv
   ramesh
   sinatra

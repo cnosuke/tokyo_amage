@@ -2,20 +2,28 @@ require 'sinatra'
 require 'sinatra/reloader' if development?
 require 'dotenv'
 require './ramesh'
+require 'dalli'
 
 Dotenv.load
+CACHE_MAX_AGE = 12 * 60 * 60 # 12 hours
+VALID_TIME_CACHE_KEY = 'valid_time_list'
 
-CACHE_MAX_AGE = 10 * 24 * 60 * 60 # 10 days
-
-
+def cache
+  @cache ||= Dalli::Client.new 'localhost:11211'
+end
 
 def now
   Time.now.tap{|t| break "#{t.strftime('%Y%m%d%H')}#{t.min - (t.min % 5) - 5}" }
 end
 
 def valid_time?(t)
-  @valid_time ||= Ramesh::Client.new.send(:meshes_index)
-  @valid_time.include?(t)
+  valid_time_list = cache.get(VALID_TIME_CACHE_KEY)
+  unless valid_time_list
+    valid_time_list = Ramesh::Client.new.send(:meshes_index)
+    cache.set(VALID_TIME_CACHE_KEY, valid_time_list, 3 * 60) # 3 mins
+  end
+
+  valid_time_list.include?(t)
 end
 
 def valid_format?(f)
@@ -44,7 +52,14 @@ get '/d/:time.:format' do
   return 404 unless valid_format?(f)
   return 404 unless valid_time?(t)
 
+  fname = "#{t}.#{f}"
+  img = cache.get(fname)
+  unless img
+    img = Ramesh::Image.new(t).to_blob
+    cache.set(fname, img, CACHE_MAX_AGE)
+  end
+
   cache_control :public, max_age: CACHE_MAX_AGE
   content_type 'image/jpeg'
-  Ramesh::Image.new(t).to_blob
+  img
 end
