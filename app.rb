@@ -11,7 +11,7 @@ def cache
 end
 
 def now
-  (Time.now - (1*60)).tap{|t| break "#{t.strftime('%Y%m%d%H')}#{t.min - (t.min % 5)}" }
+  (Time.now - (1*60)).tap{|t| break "#{t.strftime('%Y%m%d%H')}#{sprintf('%02d',(t.min - (t.min % 5)))}" }
 end
 
 def valid_time?(t)
@@ -37,7 +37,7 @@ error 404 do
 end
 
 get '/' do
-  'index'
+  haml :index
 end
 
 get '/current' do
