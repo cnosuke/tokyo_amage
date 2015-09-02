@@ -7,11 +7,11 @@ CACHE_MAX_AGE = 12 * 60 * 60 # 12 hours
 VALID_TIME_CACHE_KEY = 'valid_time_list'
 
 def cache
-  @cache ||= Dalli::Client.new 'localhost:11211'
+  @cache ||= Dalli::Client.new('127.0.0.1:11211')
 end
 
 def now
-  Time.now.tap{|t| break "#{t.strftime('%Y%m%d%H')}#{t.min - (t.min % 5) - 5}" }
+  (Time.now - (1*60)).tap{|t| break "#{t.strftime('%Y%m%d%H')}#{t.min - (t.min % 5)}" }
 end
 
 def valid_time?(t)
@@ -40,8 +40,8 @@ get '/' do
   'index'
 end
 
-get '/current.:format' do
-  redirect "/d/#{now}.#{params[:format]}", 303
+get '/current' do
+  redirect "/d/#{now}.jpg", 302
 end
 
 get '/d/:time.:format' do
