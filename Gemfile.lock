@@ -3,9 +3,9 @@ GEM
   specs:
     backports (3.6.6)
     dalli (2.7.4)
-    haml (4.0.6)
+    haml (4.0.7)
       tilt
-    mini_magick (4.2.10)
+    mini_magick (4.3.3)
     multi_json (1.11.2)
     rack (1.6.4)
     rack-protection (1.5.3)
