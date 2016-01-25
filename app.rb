@@ -10,8 +10,16 @@ def cache
   @cache ||= Dalli::Client.new('127.0.0.1:11211')
 end
 
+def time_to_s(now)
+  (now - (1*60)).tap{|t| break "#{t.strftime('%Y%m%d%H')}#{sprintf('%02d',(t.min - (t.min % 5)))}" }
+end
+
 def now
-  (Time.now - (1*60)).tap{|t| break "#{t.strftime('%Y%m%d%H')}#{sprintf('%02d',(t.min - (t.min % 5)))}" }
+  time_to_s(Time.now)
+end
+
+def now_before_5min
+  time_to_s(Time.now - 5*60)
 end
 
 def valid_time?(t)
@@ -41,7 +49,15 @@ get '/' do
 end
 
 get '/current' do
-  redirect "/d/#{now}.jpg", 302
+  if valid_time?(now)
+    redirect "/d/#{now}.jpg", 302
+  else
+    redirect "/d/#{now_before_5min}.jpg", 302
+  end
+end
+
+put 'healthcheck' do
+  'OK'
 end
 
 get '/d/:time.:format' do
