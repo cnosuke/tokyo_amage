@@ -56,7 +56,7 @@ get '/current' do
   end
 end
 
-put 'healthcheck' do
+put '/healthcheck' do
   'OK'
 end
 
