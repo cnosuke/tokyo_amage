@@ -56,6 +56,14 @@ get '/current' do
   end
 end
 
+get '/tokyo23/current' do
+  if valid_time?(now)
+    redirect "/tokyo23/#{now}.jpg", 302
+  else
+    redirect "/tokyo23/#{now_before_5min}.jpg", 302
+  end
+end
+
 put '/healthcheck' do
   'OK'
 end
@@ -70,6 +78,24 @@ get '/d/:time.:format' do
   img = cache.get(fname)
   unless img
     img = Ramesh::Image.new(t).to_blob
+    cache.set(fname, img, CACHE_MAX_AGE)
+  end
+
+  cache_control :public, max_age: CACHE_MAX_AGE
+  content_type 'image/jpeg'
+  img
+end
+
+get '/tokyo23/:time.:format' do
+  t = params[:time]
+  f = params[:format]
+  return 404 unless valid_format?(f)
+  return 404 unless valid_time?(t)
+
+  fname = "tokyo23.#{t}.#{f}"
+  img = cache.get(fname)
+  unless img
+    img = Ramesh::Image.new(t, :large).scope_to_tokyo23.to_blob
     cache.set(fname, img, CACHE_MAX_AGE)
   end
 
