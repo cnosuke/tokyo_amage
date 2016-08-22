@@ -79,6 +79,7 @@ get '/d/:time.:format' do
   unless img
     img = Ramesh::Image.new(t).to_blob
     cache.set(fname, img, CACHE_MAX_AGE)
+    GC.start
   end
 
   cache_control :public, max_age: CACHE_MAX_AGE
@@ -97,6 +98,7 @@ get '/tokyo23/:time.:format' do
   unless img
     img = Ramesh::Image.new(t, :large).scope_to_tokyo23.to_blob
     cache.set(fname, img, CACHE_MAX_AGE)
+    GC.start
   end
 
   cache_control :public, max_age: CACHE_MAX_AGE
